@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       					   http://www.springframework.org/schema/beans/spring-beans.xsd
+       					   http://camel.apache.org/schema/spring 
+       					   http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+	    <dataFormats>
+	        <xmljson id="xmljson"/>
+	    </dataFormats>
+	    <route id="twitter-demo">
+	        <from uri="twitter://search?type=polling&amp;delay=10&amp;keywords={{twitter.keywords}}&amp;accessToken={{access.token}}&amp;accessTokenSecret={{access.token-secret}}&amp;consumerKey={{consumer.key}}&amp;consumerSecret={{consumer.secret}}"/>
+	        <to uri="mongodb:twitterDb?database=twitterthing&amp;collection=twitterthing&amp;operation=save"/>
+	        <log message="&gt;&gt;&gt; ${body.user.screenName} tweeted: ${body.text}"/>
+	    </route>
+	</camelContext>
+
+    <bean id="twitterDb" class="com.mongodb.Mongo">
+        <constructor-arg index="0">
+            <bean class="com.mongodb.MongoURI">
+                <constructor-arg index="0" value="mongodb://username:password@host:port/db" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
+</beans>
